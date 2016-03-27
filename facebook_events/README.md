@@ -1,4 +1,5 @@
 # Introduce
+My script to crawl all events of a city on Facebook.  
 Not a Scrapy project, but still work as miracle :D  
 Still have to change and update a lot of codes.  
 
