@@ -1,20 +1,7 @@
 {
-    "client_id" : 1423762397650932,
-    "client_secret" : "7cf2f43c03ca1e5b76e4f36baa6e9ce7",
-	"distance" : 750,
-	"keyword" : "*",
-	"limit" : 10000,
-	"latlong": {
-		"vuonhoa_lythaito": [21.02763, 105.85367],
-		"bachkhoa_hanoi" : [21.00369, 105.84155],
-		"daihoc_quocgia_hanoi" : [21.03856, 105.78269],
-        "nga_tu_so" : [21.00472, 105.82206],
-        "ta hien" : [21.03536, 105.85195],
-        "The Yard" : [21.047484, 105.842366],
-        "Hanoi Creative City" : [21.012876, 105.863223],
-        "Nha tho lon" : [21.028698, 105.848800],
-        "Ho Dac Di" : [21.011359, 105.831026],
-        "Dai hoc Ngoai Thuong" : [21.022876, 105.805364],
-        "Royal City" : [21.001114, 105.817121]
-	}
+    "client_id" : [Your client ID here],
+    "client_secret" : [Your client Secret here],
+    "distance" : 750,
+    "keyword" : "*",
+    "limit" : 10000,
 }
