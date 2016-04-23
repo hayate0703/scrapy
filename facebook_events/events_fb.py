@@ -8,8 +8,7 @@ import requests
 from coorcal import generate_coordinate
 
 logging.basicConfig(
-    filename="debug.log",
-    level=logging.DEBUG, format='%(levelname)s:%(message)s')
+    level=logging.INFO, format='%(levelname)s:%(message)s')
 
 # Load config from file config.json
 with open('config.json', 'r') as f:
@@ -17,11 +16,7 @@ with open('config.json', 'r') as f:
 
 # Get App Access Token
 token = requests.get("https://graph.facebook.com/v2.5/oauth/access_token?client_id={0}&client_secret={1}&&grant_type=client_credentials".format(
-    args["client_id"], args["client_secret"]))
-
-# Create folder results to export results to
-if not os.path.exists("./results"):
-    os.makedirs("./results")
+    args["client_id"], args["client_secret"])).json()['access_token']
 
 
 def get_page_ids(lat, lon):
@@ -33,28 +28,44 @@ def get_page_ids(lat, lon):
         lat, lon,
         args["distance"],
         args["limit"],
-        token.content.split('"')[3]))
+        token)).json()
     # Create a list of all ID
-    pages_id_list = [i.values()[0] for i in pages_id.json()['data']]
+    pages_id_list = [i['id'] for i in pages_id['data']]
+    # Process Facebook API paging
+    while pages_id['paging'].has_key('next'):
+        pages_id = requests.get(pages_id["paging"]['next']).json()
+        for a in pages_id['data']:
+            pages_id_list.append(a['id'])
+
     return pages_id_list
 
 
-def events_from_page_id(id):
+def events_from_page_id(pageid):
     '''
     For each page ID, find all event (if have) of that Page from today.
     Return a dictionary of page's infos and it's events.
     '''
-    events = requests.get("https://graph.facebook.com/v2.5/?ids={0}&fields=events.fields(id,name,start_time,description,place,type,category,ticket_uri,cover.fields(id,source),picture.type(large),attending_count,declined_count,maybe_count,noreply_count).since({1}),id,name,cover.fields(id,source),picture.type(large),location&access_token={2}".format(
-        id, time.strftime("%Y-%m-%d"), token.content.split('"')[3]))
+    events = requests.get("https://graph.facebook.com/v2.6/",
+            params={
+                "ids" : pageid,
+                "fields" : "events.fields(id,name,start_time,description,place,type,category,ticket_uri,cover.fields(id,source),picture.type(large),attending_count,declined_count,maybe_count,noreply_count).since({0}),id,name,cover.fields(id,source),picture.type(large),location".format(time.strftime("%Y-%m-%d")),
+                "access_token":token,
+                }
+            )
+
     return events.json()
 
+
 if __name__ == '__main__':
-    CIRCLE = (21.027875, 105.853654, 10000,)
+    CIRCLE = (21.027875, 105.853654, 1000,)
     for point in generate_coordinate(*CIRCLE, scan_radius=args["distance"]):
         for page_id in get_page_ids(point[0], point[1]):
-            if 'events' in events_from_page_id(page_id).values()[0]:
-                file_name = "./results/" + page_id + ".json"
-                with open(file_name, 'wb') as f:
-                    json.dump(events_from_page_id(page_id), f, indent=4)
+            logging.debug(page_id)
+            event = events_from_page_id(page_id)[page_id]
+            if event.has_key('events'):
+                logging.info(event['events'])
             else:
-                pass
+                logging.debug(event['name'])
+
+
+
