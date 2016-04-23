@@ -1,7 +1,0 @@
-{
-    "client_id" : [Your client ID here],
-    "client_secret" : [Your client Secret here],
-    "distance" : 750,
-    "keyword" : "*",
-    "limit" : 10000,
-}
