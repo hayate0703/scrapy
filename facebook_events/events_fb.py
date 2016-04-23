@@ -24,7 +24,7 @@ if not os.path.exists("./results"):
     os.makedirs("./results")
 
 
-def get_page_id(lat, lon):
+def get_page_ids(lat, lon):
     '''
     Get pages's ID from a location. Return a list of all ID.
     '''
@@ -39,7 +39,7 @@ def get_page_id(lat, lon):
     return pages_id_list
 
 
-def get_envents_from_page_id(id):
+def events_from_page_id(id):
     '''
     For each page ID, find all event (if have) of that Page from today.
     Return a dictionary of page's infos and it's events.
@@ -51,10 +51,10 @@ def get_envents_from_page_id(id):
 if __name__ == '__main__':
     CIRCLE = (21.027875, 105.853654, 10000,)
     for point in generate_coordinate(*CIRCLE, scan_radius=args["distance"]):
-        for i in get_page_id(point[0], point[1]):
-            if 'events' in get_envents_from_page_id(i).values()[0]:
-                file_name = "./results/" + i + ".json"
+        for page_id in get_page_ids(point[0], point[1]):
+            if 'events' in events_from_page_id(page_id).values()[0]:
+                file_name = "./results/" + page_id + ".json"
                 with open(file_name, 'wb') as f:
-                    json.dump(get_envents_from_page_id(i), f, indent=4)
+                    json.dump(events_from_page_id(page_id), f, indent=4)
             else:
                 pass
